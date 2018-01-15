@@ -15,6 +15,7 @@ var UserSchema = new Schema({
         unique: true,
         required: true
     },
+
     password: {
         type: String,
         validate: [
@@ -24,6 +25,20 @@ var UserSchema = new Schema({
             'Password should be longer than 6'
         ]
     },
+
+    salt:{
+        type: String
+    },
+
+    provider:{
+        type: String,
+        required: 'Provider is required'
+    },
+
+    providerId: String,
+
+    providerData: {},
+
     created: {
         type: Date,
         default: Date.now
@@ -45,6 +60,43 @@ var UserSchema = new Schema({
         }
     }
 })
+
+UserSchema.pre('save', function (next) {
+    if(this.password){
+        this.salt = new
+        Buffer(crypto.randomBytes(16).toString('base64'), 'base64')
+        this.password = this.hashPassword(this.password)
+    }
+    next()
+})
+
+UserSchema.methods.hashPassword = function (password) {
+    return crypto.pbkdf2Sync(password, this.salt, 10000,
+    64).toString('base64')
+}
+
+UserSchema.methods.authenticate = function (password) {
+    return this.password === this.hashPassword(password)
+}
+
+UserSchema.statics.findUniqueUsername = function (username, suffix, 
+    callback) {
+        var possibleUsername = username + ( suffix || '')
+        this.findOne({
+            username: possibleUsername
+        }, (err, user) => {
+            if(!err){
+                if(!user){
+                    callback(possibleUsername)
+                }else{
+                    return this.findUniqueUsername(username, (suffix || 0) + 1,
+                    callback)
+                }
+            }else{
+                callback(null)
+            }
+        })
+}
 
 UserSchema.virtual('fullName').get(function () {
     return this.firstName + ' ' + this.lastName
