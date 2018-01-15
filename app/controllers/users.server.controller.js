@@ -29,7 +29,7 @@ exports.renderSignin = function (req, res, next) {
     if(!req.user){
         res.render('signin', {
             title: 'Sign-in Form',
-            message: req.flash('error') || req.flash('info')
+            messages: req.flash('error') || req.flash('info')
         })
     }else{
         return res.redirect('/')
@@ -40,7 +40,7 @@ exports.renderSignup = function (req, res, next) {
     if(!req.user){
         res.render('signup', {
             title: 'Sign-up Form',
-            message: req.flash('error')
+            messages: req.flash('error')
         })
     }else{
         return res.redirect('/')

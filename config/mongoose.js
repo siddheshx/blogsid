@@ -1,13 +1,16 @@
-var config = require('./config')
-var mongoose = require('mongoose')
-mongoose.Promise = require('bluebird')
+// Load the module dependencies
+const config = require('./config');
+const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 
-module.exports = function () {
-    
-    var db = mongoose.connect(config.db, { useMongoClient : true })
+// Define the Mongoose configuration method
+module.exports = function() {
+	// Use Mongoose to connect to MongoDB
+	const db = mongoose.connect(config.db, { useMongoClient: true });
 
-    require('../app/models/user.server.model')
+	// Load the 'User' model 
+	require('../app/models/user.server.model');
 
-    return db;
-}
-
+	// Return the Mongoose connection instance
+	return db;
+};
